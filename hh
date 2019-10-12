@@ -2,19 +2,22 @@
 # Hanke-Henry Permanent Calendar Date Converter
 # Initial 2015-03-21/pjh
 # Rewrite 2018-08-06/pjh
+# Fix UTC 2019-08-30/pjh
 
 # See: http://hankehenryontime.com/ for details.
 
-# Calculates H-H date (in UTC), based on current date, then solves for edge cases.
+# Calculates H-H date (in UTC), based on current Gregorian date, then solves
+# for edge cases.
 
-# TODO: Calculate dates past 2038.
+# TODO Calculate dates past 2038
 
-VERBOSE=
+DISPLAY=true
 GREGORY=
 PREFIX=
-DISPLAY=true
 DISTIME=
 DISPDOW=
+
+VERBOSE=
 highlit=true
 
 DOMINI=(G A B C D E F)
@@ -56,19 +59,10 @@ HHd=(0\
 
 setdate() { # usage: setdate [yesterday|today|tomorrow]
 	# UTC
-	ctime=$(date +%R)
-	utime=$(date -u +%R)
-
-	year=$(date -ud "$1 $ctime" +%Y)
-	month=$(date -ud "$1 $ctime" +%0m)
-	day=$(date -ud "$1 $ctime" +%0d)
-	dow=$(date -ud "$1 $ctime" +%w)
-}
-
-fixUTC() {
-	if [ "$(date -u +%H)" -lt "$(date +%H)" ]; then
-		setdate "$year-$month-$day + 1 day"
-	fi
+	year=$(	date -d "$1" $2 +%Y)
+	month=$(date -d "$1" $2 +%0m)
+	day=$(	date -d "$1" $2 +%0d)
+	dow=$(	date -d "$1" $2 +%w)
 }
 
 is_leap_year() { ## USAGE: is_leap_year [year]
@@ -96,6 +90,11 @@ is_extra() {
 		fi
 	done
 }
+centre() {
+  termwidth=20
+  padding="$(printf '%0.1s' ' '{1..500})"
+  printf '%*.*s %s %*.*s\n' 0 "$(((termwidth-2-${#1})/2))" "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
+}
 
 print_calendar() {
 	if [ $highlit ]; then
@@ -108,7 +107,7 @@ print_calendar() {
 	January							February						March
 	Mo	Tu	We	Th	Fr	Sa	Su		Mo	Tu	We	Th	Fr	Sa	Su		Mo	Tu	We	Th	Fr	Sa	Su	$no
 	01	02	03	04	05	06	07				01	02	03	04	05						01	02	03
-	08	09	10	11	12	13	14		06	07	08	09	10	11	12		04	05	06	07	8	9	10
+	08	09	10	11	12	13	14		06	07	08	09	10	11	12		04	05	06	07	08	09	10
 	15	16	17	18	19	20	21		13	14	15	16	17	18	19		11	12	13	14	15	16	17
 	22	23	24	25	26	27	28		20	21	22	23	24	25	26		18	19	20	21	22	23	24
 	29	30							27	28	29	30					25	26	27	28	29	30	31
@@ -142,42 +141,96 @@ print_calendar() {
 																	01	02	03	04	05	06	07
 EOF
 }
+print_month() {
+	local mon
+	(( mon=10#$month ))
+	[[ $mon == 1 || $mon == 4 || $mon == 7 || $mon == 10 ]] && pos=1
+	[[ $mon == 2 || $mon == 5 || $mon == 8 || $mon == 11 ]] && pos=2
+	[[ $mon == 3 || $mon == 6 || $mon == 9 || $mon == 12 ]] && pos=3
+
+	[ $VERBOSE ] && printf "This month: %s, position %s\n" $mon $pos
+	centre "${MONTHL[$mon]}"
+	
+	case $pos in
+		1)
+			echo "Mo Tu We Th Fr Sa Su"
+			echo "01 02 03 04 05 06 07"
+			echo "08 09 10 11 12 13 14"
+			echo "15 16 17 18 19 20 21"
+			echo "22 23 24 25 26 27 28"
+			echo "29 30"
+		;;
+		2)
+			echo "Mo Tu We Th Fr Sa Su"
+			echo "      01 02 03 04 05"
+			echo "06 07 08 09 10 11 12"
+			echo "13 14 15 16 17 18 19"
+			echo "20 21 22 23 24 25 26"
+			echo "27 28 29 30"
+		;;
+		3)
+			echo "Mo Tu We Th Fr Sa Su"
+			echo "            01 02 03"
+			echo "04 05 06 07 08 09 10"
+			echo "11 12 13 14 15 16 17"
+			echo "18 19 20 21 22 23 24"
+			echo "25 26 27 28 29 30 31"
+		;;
+	esac
+
+}
 
 setdate today
 
-while getopts "gpstwy:m:d:lcHv?" OPTION
+while getopts "ghptwWy:m:d:lLcMHUv?" OPTION
 do
 	case $OPTION in
 		g)	[ $GREGORY ] && unset GREGORY || GREGORY=true;;	# Gregorian date
+		h)	[ $DISPLAY ] && unset DISPLAY || DISPLAY=true;;	# Hanke-Henry date
 		p)	[ $PREFIX  ] && unset PREFIX  || PREFIX=true;;	# prefix
-		s)	[ $DISPLAY ] && unset DISPLAY || DISPLAY=true;;	# H-H date
 		t)	[ $DISTIME ] && unset DISTIME || DISTIME=true;;	# time display
 		w)	[ $DISPDOW ] && unset DISPDOW || DISPDOW=true;;	# day-of-week
+		W)	[ $DISPDWS ] && unset DISPDWS || DISPDWS=true;;	# short day-of-week
 
-		y)	setdate "$OPTARG-$month-$day ";;				# set year
-		m)	setdate "$year-$OPTARG-$day  ";;				# set month
-		d)	setdate "$year-$month-$OPTARG"; fixUTC;;		# set day
+		y)	setdate "$OPTARG-$month-$day";;					# set year
+		m)	setdate "$year-$OPTARG-$day";;					# set month
+		d)	setdate "$year-$month-$OPTARG";;				# set day
 
 		l)	for i in {2018..2054}; do						# list dominical letters
-			echo $i $(hh -vs -y$i -m1 -d1); done; exit;;
+			echo $i $(hh -hL -y$i -m1 -d1); done; exit;;
+		L)	DOMINIC=true;;
 		c)	print_calendar; exit;;							# print calendar
+		M)	PRINTMONTH=true;;								# print monthly calendar
 		H)	unset highlit;;									# disable highlighting
+		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				# update git repository
+			cp -uv $HOME/share/man/man1/hh.1 $HOME/src/hh/
+			exit;;
 		v)	VERBOSE=true;;									# verbose
 		*)	[ $(which getusage) ] && getusage $0; exit;;
 	esac
 done
 
+# fixUTC
+ctime=$(date +%R)
+utime=$(date -u +%R)
+tz=$(date -d "$year-$month-$day" +%Z)
+[ $VERBOSE ] && echo "$year-$month-$day $ctime $tz"
+
+setdate "$year-$month-$day $ctime $tz" "-u"
+[ $VERBOSE ] && echo "$year-$month-$day $utime UTC"
+
 # Hanke-Henry calendar adopted 1 January 2018
 [[ $year -lt 2018 ]] && echo $(basename $0): Proleptic display not enabled. && exit
 
 # Set HH date
-jd="$(date -d $year-$month-$day +%j)"
+doy="$(date -d $year-$month-$day +%j)"
 soy="$(date -d $year-01-01 +%w)"
 eoy="$(date -d $year-12-31 +%w)"
 
 (( dominical=((year-1)%100%4*2+(year-1)%100%7*4+(year-1)/100%4*2)%7 ))
 
 is_leap_year $year
+
 if [ $_IS_LEAP_YEAR ]; then
 	leap="L"
 	if [ $dominical -eq 0 ]; then 
@@ -194,48 +247,53 @@ is_extra $year
 
 # Solve for edge cases
 case $dom in
-	F)	(( jd=$jd+1 ))
-		[ "$month-$day" == "12-30" ] && jd=1 && (( year=$year+1 )) && month=1 && day=1
-		[ "$month-$day" == "12-31" ] && jd=2 && (( year=$year+1 )) && month=1 && day=2;;
-	G)	[ "$month-$day" == "12-31" ] && jd=1 && (( year=$year+1 )) && month=1 && day=1;;
-	ED)	(( jd=$jd+2 ));;
-	C)	(( jd=$jd-3 ))
-		[ "$month-$day" == "01-01" ] && jd=369 && (( year=$year-1 ))
-		[ "$month-$day" == "01-02" ] && jd=370 && (( year=$year-1 ))
-		[ "$month-$day" == "01-03" ] && jd=371 && (( year=$year-1 ));;
-	B)	(( jd=$jd-2 ))
+	F)	(( doy=10#$doy+1 ))
+		[ "$month-$day" == "12-30" ] && doy=1 && (( year=$year+1 )) && month=1 && day=1
+		[ "$month-$day" == "12-31" ] && doy=2 && (( year=$year+1 )) && month=1 && day=2;;
+	G)	[ "$month-$day" == "12-31" ] && doy=1 && (( year=$year+1 )) && month=1 && day=1;;
+	ED)	(( doy=10#$doy+2 ));;
+	C)	(( doy=10#$doy-3 ))
+		[ "$month-$day" == "01-01" ] && doy=369 && (( year=$year-1 ))
+		[ "$month-$day" == "01-02" ] && doy=370 && (( year=$year-1 ))
+		[ "$month-$day" == "01-03" ] && doy=371 && (( year=$year-1 ));;
+	B)	(( doy=10#$doy-2 ))
 		if [ $pxtr ]; then # previous year is xtr year
-			[ "$month-$day" == "01-01" ] && jd=370 && (( year=$year-1 ))
-			[ "$month-$day" == "01-02" ] && jd=371 && (( year=$year-1 ))
+			[ "$month-$day" == "01-01" ] && doy=370 && (( year=$year-1 ))
+			[ "$month-$day" == "01-02" ] && doy=371 && (( year=$year-1 ))
 		else
-			[ "$month-$day" == "01-01" ] && jd=363 && (( year=$year-1 ))
-			[ "$month-$day" == "01-02" ] && jd=364 && (( year=$year-1 ))
+			[ "$month-$day" == "01-01" ] && doy=363 && (( year=$year-1 ))
+			[ "$month-$day" == "01-02" ] && doy=364 && (( year=$year-1 ))
 		fi;;
-	A)	(( jd=$jd-1 ))
-		[ "$month-$day" == "01-01" ] && jd=364 && (( year=$year-1 ));;
-	GF)	[ "$month-$day" == "12-30" ] && jd=1 && (( year=$year+1 )) && month=1 && day=1
-		[ "$month-$day" == "12-31" ] && jd=2 && (( year=$year+1 )) && month=1 && day=2;;
-	E)	(( jd=$jd+2 ))
-		[ "$month-$day" == "12-29" ] && jd=1 && (( year=$year+1 )) && month=1 && day=1
-		[ "$month-$day" == "12-30" ] && jd=2 && (( year=$year+1 )) && month=1 && day=2
-		[ "$month-$day" == "12-31" ] && jd=3 && (( year=$year+1 )) && month=1 && day=3;;
-	D)	(( jd=$jd+3 ));;
-	BA)	(( jd=$jd-2 ))
-		[ "$month-$day" == "01-01" ] && jd=363 && (( year=$year-1 ))
-		[ "$month-$day" == "01-02" ] && jd=364 && (( year=$year-1 ));;
-	DC)	(( jd=$jd+3 ));;
-	FE)	(( jd=$jd+1 ))
-		[ "$month-$day" == "12-29" ] && jd=1 && (( year=$year+1 )) && month=1 && day=1
-		[ "$month-$day" == "12-30" ] && jd=2 && (( year=$year+1 )) && month=1 && day=2
-		[ "$month-$day" == "12-31" ] && jd=3 && (( year=$year+1 )) && month=1 && day=3;;
+	A)	(( doy=10#$doy-1 ))
+		[ "$month-$day" == "01-01" ] && doy=364 && (( year=$year-1 ));;
+	GF)	[ "$month-$day" == "12-30" ] && doy=1 && (( year=$year+1 )) && month=1 && day=1
+		[ "$month-$day" == "12-31" ] && doy=2 && (( year=$year+1 )) && month=1 && day=2;;
+	E)	(( doy=10#$doy+2 ))
+		[ "$month-$day" == "12-29" ] && doy=1 && (( year=$year+1 )) && month=1 && day=1
+		[ "$month-$day" == "12-30" ] && doy=2 && (( year=$year+1 )) && month=1 && day=2
+		[ "$month-$day" == "12-31" ] && doy=3 && (( year=$year+1 )) && month=1 && day=3;;
+	D)	(( doy=10#$doy+3 ));;
+	BA)	(( doy=10#$doy-2 ))
+		[ "$month-$day" == "01-01" ] && doy=363 && (( year=$year-1 ))
+		[ "$month-$day" == "01-02" ] && doy=364 && (( year=$year-1 ));;
+	DC)	(( doy=10#$doy+3 ));;
+	FE)	(( doy=10#$doy+1 ))
+		[ "$month-$day" == "12-29" ] && doy=1 && (( year=$year+1 )) && month=1 && day=1
+		[ "$month-$day" == "12-30" ] && doy=2 && (( year=$year+1 )) && month=1 && day=2
+		[ "$month-$day" == "12-31" ] && doy=3 && (( year=$year+1 )) && month=1 && day=3;;
 esac
 
-[ $VERBOSE ] && printf "DOM $dom -> starts ${DOWL[$soy]}, ends ${DOWL[$eoy]} $leap$xtr_text\n"
+[ $DOMINIC ] && printf "DOM $dom -> starts ${DOWL[$soy]}, ends ${DOWL[$eoy]} $leap$xtr_text\n"
+
 [ $GREGORY ] && [ $PREFIX  ] && printf "Grg. "
 [ $GREGORY ] && [ $DISPDOW ] && printf "%s " ${DOWL[$dow]}
 [ $GREGORY ] && printf "%d %s %d UTC\n" $day ${MONTHL[10#$month]} $year
+
 [ $DISPLAY ] && [ $PREFIX  ] && printf "H-H. "
 [ $DISPLAY ] && [ $DISPDOW ] && printf "%s " ${DOWL[$dow]}
-[ $DISPLAY ] && printf "%s %s %s" ${HHd[10#$jd]} ${MONTHL[${HHm[10#$jd]}]} $year
+[ $DISPLAY ] && [ $DISPDWS ] && printf "%s " ${DOWS[$dow]}
+[ $DISPLAY ] && printf "%s %s %s" ${HHd[10#$doy]} ${MONTHL[${HHm[10#$doy]}]} $year
 [ $DISPLAY ] && [ $DISTIME ] && printf " %s"  $utime
 [ $DISPLAY ] && printf "\n"
+
+[ $PRINTMONTH ] && print_month

@@ -1,0 +1,20 @@
+#!/bin/bash
+# Self-documenting help system
+# 2018-03-16/pjh
+
+# Usage: 	Setup 'getopts' while loop, and add comments after each option:
+#			s)	<code> # comment
+# Call:		[ $(which getusage) ] && getusage $0
+
+[ $# == 0 ] && echo $(basename $0): Please specify filename. && exit 1
+[ ! -f $1 ] && echo $(basename $0): File not found. && exit 1 
+
+blok=$(sed '/^\s*while getopts/,/^\s*done/!d' $1)
+args=$(sed '/getopts/!d;s/.* \"//;s/\".*//;s/://g' <<< "$blok")
+opts=$(sed '/# /!d;s/^\s*/  -/;s/)\s.*# /    /' <<< "$blok")
+
+if [ "$args" ]; then
+	echo "usage: $(basename $1) [-$args]";echo
+	[ "$opts" ] && echo "$opts"
+	echo "  -?    help"
+fi

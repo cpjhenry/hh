@@ -1,16 +1,19 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "HH" "1" "August 2018" "" ""
+.TH "HH" "1" "October 2019" "" ""
 .
 .SH "NAME"
 \fBhh\fR \- convert Gregorian dates to Hanke\-Henry dates
 .
 .SH "SYNOPSIS"
-\fBhh\fR [\-gpstw] [\-y year] [\-m month] [\-d day|yesterday|today|tomorrow] [\-lcHv?]
+\fBhh\fR [\-ghptwW] [\-y year] [\-m month] [\-d day|yesterday|today|tomorrow] [\-lcMHv?]
 .
 .SH "DESCRIPTION"
-One of many examples of leap week calendars, calendars which maintain synchronization with the solar year by intercalating entire weeks rather than single days\. By reducing common years to 364 days (52 weeks), and adding an extra week every five or six years, the Hanke\-Henry Permanent Calendar eliminates weekday drift and synchronizes the calendar year with the seasonal change as the Earth circles the Sun\. As part of the calendar proposal, time zones would be eliminated and replaced with UTC\.
+\fBhh\fR is a bash script which calculates the Hanke\-Henry Permanent Calendar (HHPC) date from the current (or supplied) date\.
+.
+.P
+The HHPC is one of many examples of leap week calendars, calendars which maintain synchronization with the solar year by intercalating entire weeks rather than single days\. By reducing common years to 364 days (52 weeks), and adding an extra week every five or six years, it eliminates weekday drift and synchronizes the calendar year with the seasonal change as the Earth circles the Sun\. As part of the calendar proposal, time zones would be eliminated and replaced with UTC\.
 .
 .SH "OPTIONS"
 .
@@ -19,12 +22,12 @@ One of many examples of leap week calendars, calendars which maintain synchroniz
 Toggle Gregorian date\.
 .
 .TP
-\fB\-p\fR
-Toggle prefix\.
+\fB\-h\fR
+Toggle Hanke\-Henry date\.
 .
 .TP
-\fB\-s\fR
-Toggle Hanke\-Henry date\.
+\fB\-p\fR
+Toggle prefix\.
 .
 .TP
 \fB\-t\fR
@@ -33,6 +36,10 @@ Toggle time display\.
 .TP
 \fB\-w\fR
 Toggle day\-of\-week display\.
+.
+.TP
+\fB\-W\fR
+Toggle short day\-of\-week display\.
 .
 .TP
 \fB\-y\fR
@@ -53,6 +60,10 @@ List dominical letters\.
 .TP
 \fB\-c\fR
 Print Hanke\-Henry calendar\.
+.
+.TP
+\fB\-M\fR
+Print monthly Hanke\-Henry calendar\.
 .
 .TP
 \fB\-H\fR
