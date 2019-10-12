@@ -14,7 +14,7 @@ eliminated and replaced with UTC.
 
 ## Installation
 - Copy script to local `bin` directory, or somewhere in path.
-- Copy man file to your local `share/man` directory or somewhere in `manpath`.
+- Copy man file to your local `share/man` directory or somewhere in manpath.
 - Copy **getusage** to local `bin` directory, or path.
 
 ## History
