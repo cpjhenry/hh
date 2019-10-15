@@ -192,9 +192,9 @@ do
 		w)	[ $DISPDOW ] && unset DISPDOW || DISPDOW=true;;	# day-of-week
 		W)	[ $DISPDWS ] && unset DISPDWS || DISPDWS=true;;	# short day-of-week
 
-		y)	setdate "$OPTARG-$month-$day";;					# set year
-		m)	setdate "$year-$OPTARG-$day";;					# set month
-		d)	setdate "$year-$month-$OPTARG";;				# set day
+		y)	year=$OPTARG;;									# set year
+		m)	month=$OPTARG;;									# set month
+		d) 	day=$OPTARG;;									# set day
 
 		l)	for i in {2018..2054}; do						# list dominical letters
 			echo $i $(hh -hL -y$i -m1 -d1); done; exit;;
@@ -210,6 +210,7 @@ do
 	esac
 done
 
+setdate $year-$month-$day
 # fixUTC
 ctime=$(date +%R)
 utime=$(date -u +%R)
