@@ -13,15 +13,15 @@ Earth circles the Sun. As part of the calendar proposal, time zones would be
 eliminated and replaced with UTC.
 
 ## Installation
-- Copy script to local `bin` directory, or somewhere in path.
-- Copy man file to your local `share/man` directory or somewhere in manpath.
-- Copy **getusage** to local `bin` directory, or path.
+- Copy script to local `bin` directory path.
+- Copy man file to your local `share/man` or manpath.
+- Copy **getusage** to local `bin` directory or path.
 
 ## History
 As an aficionado of horology, I went looking for a tool which would easily
-calculate the HHPC date. While several bits of code existed to enable such
-calculations through websites (e.g. Javascript), I needed something which
-could display the HHPC date on the commandline.
+calculate the HHPC date. While several examples of code could be found to
+enable such calculations through websites (e.g. Javascript), I needed
+something which could display the HHPC date on the commandline.
 
 Finding none, I created my own.
 
