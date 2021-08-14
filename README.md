@@ -12,6 +12,8 @@ drift and synchronizes the calendar year with the seasonal change as the
 Earth circles the Sun. As part of the calendar proposal, time zones would be
 eliminated and replaced with UTC.
 
+See: http://hankehenryontime.com/ for more details.
+
 ## Installation
 - Copy script to local `bin` directory path.
 - Copy man file to local `share/man` or manpath.
