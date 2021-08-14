@@ -182,7 +182,7 @@ print_month() {
 
 setdate today
 
-while getopts "ghptwWy:m:d:lLcMHUv?" OPTION
+while getopts "ghptwWy:m:d:lLCMHUv?" OPTION
 do
 	case $OPTION in
 		g)	[ $GREGORY ] && unset GREGORY || GREGORY=true;;	# Gregorian date
@@ -199,7 +199,7 @@ do
 		l)	for i in {2018..2054}; do						# list dominical letters
 			echo $i $(hh -hL -y$i -m1 -d1); done; exit;;
 		L)	DOMINIC=true;;
-		c)	print_calendar; exit;;							# print calendar
+		C)	print_calendar; exit;;							# print calendar
 		M)	PRINTMONTH=true;;								# print monthly calendar
 		H)	unset highlit;;									# disable highlighting
 		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				# update git repository
