@@ -9,7 +9,7 @@
 # Calculates H-H date (in UTC), based on current Gregorian date, then solves
 # for edge cases.
 
-# TODO Calculate dates past 2038
+# TODO Verify dates past 2038
 
 DISPLAY=true
 GREGORY=
@@ -93,7 +93,7 @@ is_extra() {
 centre() {
   termwidth=20
   padding="$(printf '%0.1s' ' '{1..500})"
-  printf '%*.*s %s %*.*s\n' 0 "$(((termwidth-2-${#1})/2))" "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
+  printf "%*.*s $bo%s$no %*.*s\n" 0 "$(((termwidth-2-${#1})/2))" "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
 }
 
 print_calendar() {
@@ -143,6 +143,11 @@ EOF
 }
 print_month() {
 	local mon
+
+	if [ $highlit ]; then
+		bo=$'\e[1m'
+		no=$'\e[0m'; fi
+
 	(( mon=10#$month ))
 	[[ $mon == 1 || $mon == 4 || $mon == 7 || $mon == 10 ]] && pos=1
 	[[ $mon == 2 || $mon == 5 || $mon == 8 || $mon == 11 ]] && pos=2
@@ -152,24 +157,24 @@ print_month() {
 	centre "${MONTHL[$mon]}"
 	
 	case $pos in
-		1)
-			echo "Mo Tu We Th Fr Sa Su"
+		1)  echo -n "$bo"
+			echo "Mo Tu We Th Fr Sa Su $no"
 			echo "01 02 03 04 05 06 07"
 			echo "08 09 10 11 12 13 14"
 			echo "15 16 17 18 19 20 21"
 			echo "22 23 24 25 26 27 28"
 			echo "29 30"
 		;;
-		2)
-			echo "Mo Tu We Th Fr Sa Su"
+		2)  echo -n "$bo"
+			echo "Mo Tu We Th Fr Sa Su $no"
 			echo "      01 02 03 04 05"
 			echo "06 07 08 09 10 11 12"
 			echo "13 14 15 16 17 18 19"
 			echo "20 21 22 23 24 25 26"
 			echo "27 28 29 30"
 		;;
-		3)
-			echo "Mo Tu We Th Fr Sa Su"
+		3)  echo -n "$bo"
+			echo "Mo Tu We Th Fr Sa Su $no"
 			echo "            01 02 03"
 			echo "04 05 06 07 08 09 10"
 			echo "11 12 13 14 15 16 17"
@@ -200,7 +205,7 @@ do
 			echo $i $(hh -hL -y$i -m1 -d1); done; exit;;
 		L)	DOMINIC=true;;
 		C)	print_calendar; exit;;							# print calendar
-		M)	PRINTMONTH=true;;								# print monthly calendar
+		M)	print_month;exit;;								# print monthly calendar
 		H)	unset highlit;;									# disable highlighting
 		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				# update git repository
 			cp -uv $HOME/share/man/man1/hh.1 $HOME/src/hh/
@@ -296,5 +301,3 @@ esac
 [ $DISPLAY ] && printf "%s %s %s" ${HHd[10#$doy]} ${MONTHL[${HHm[10#$doy]}]} $year
 [ $DISPLAY ] && [ $DISTIME ] && printf " %s"  $utime
 [ $DISPLAY ] && printf "\n"
-
-[ $PRINTMONTH ] && print_month
