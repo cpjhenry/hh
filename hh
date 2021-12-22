@@ -298,6 +298,6 @@ esac
 [ $DISPLAY ] && [ $PREFIX  ] && printf "H-H. "
 [ $DISPLAY ] && [ $DISPDOW ] && printf "%s " ${DOWL[$dow]}
 [ $DISPLAY ] && [ $DISPDWS ] && printf "%s " ${DOWS[$dow]}
-[ $DISPLAY ] && printf "%s %s %s" ${HHd[10#$doy]} ${MONTHL[${HHm[10#$doy]}]} $year
+[ $DISPLAY ] && printf "%s %s %d" ${HHd[10#$doy]} ${MONTHL[${HHm[10#$doy]}]} $year
 [ $DISPLAY ] && [ $DISTIME ] && printf " %s"  $utime
 [ $DISPLAY ] && printf "\n"
