@@ -207,7 +207,7 @@ do
 		C)	print_calendar; exit;;							# print calendar
 		M)	print_month;exit;;								# print monthly calendar
 		H)	unset highlit;;									# disable highlighting
-		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				# update git repository
+		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				#- update git repository
 			cp -uv $HOME/share/man/man1/hh.1 $HOME/src/hh/
 			exit;;
 		v)	VERBOSE=true;;									# verbose
