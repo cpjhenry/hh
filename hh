@@ -19,6 +19,7 @@ DISPDOW=
 
 VERBOSE=
 highlit=true
+CENTMTH=
 
 DOMINI=(G A B C D E F)
 MONTHS=(- Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec Xtr)
@@ -154,7 +155,7 @@ print_month() {
 	[[ $mon == 3 || $mon == 6 || $mon == 9 || $mon == 12 ]] && pos=3
 
 	[ $VERBOSE ] && printf "This month: %s, position %s\n" $mon $pos
-	centre "${MONTHL[$mon]}"
+	[ $CENTMTH ] && centre "${MONTHL[$mon]}" || printf "$bo${MONTHL[$mon]}$no\n"
 	
 	case $pos in
 		1)  echo -n "$bo"
@@ -205,7 +206,7 @@ do
 			echo $i $(hh -hL -y$i -m1 -d1); done; exit;;
 		L)	DOMINIC=true;;
 		C)	print_calendar; exit;;							# print calendar
-		M)	print_month;exit;;								# print monthly calendar
+		M)	print_month; exit;;								# print monthly calendar
 		H)	unset highlit;;									# disable highlighting
 		U)	cp -uv $HOME/bin/hh $HOME/src/hh/				#- update git repository
 			cp -uv $HOME/share/man/man1/hh.1 $HOME/src/hh/
