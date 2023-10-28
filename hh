@@ -155,29 +155,30 @@ print_month() {
 	[[ $mon == 3 || $mon == 6 || $mon == 9 || $mon == 12 ]] && pos=3
 
 	[ $VERBOSE ] && printf "This month: %s, position %s\n" $mon $pos
+	[ $PREFIX  ] && printf "HHPC / "
 	[ $CENTMTH ] && centre "${MONTHL[$mon]}" || printf "$bo${MONTHL[$mon]}$no\n"
 	
 	case $pos in
 		1)  echo -n "$bo"
 			echo "Mo Tu We Th Fr Sa Su $no"
-			echo "01 02 03 04 05 06 07"
-			echo "08 09 10 11 12 13 14"
+			echo " 1  2  3  4  5  6  7"
+			echo " 8  9 10 11 12 13 14"
 			echo "15 16 17 18 19 20 21"
 			echo "22 23 24 25 26 27 28"
 			echo "29 30"
 		;;
 		2)  echo -n "$bo"
 			echo "Mo Tu We Th Fr Sa Su $no"
-			echo "      01 02 03 04 05"
-			echo "06 07 08 09 10 11 12"
+			echo "       1  2  3  4  5"
+			echo " 6  7  8  9 10 11 12"
 			echo "13 14 15 16 17 18 19"
 			echo "20 21 22 23 24 25 26"
 			echo "27 28 29 30"
 		;;
 		3)  echo -n "$bo"
 			echo "Mo Tu We Th Fr Sa Su $no"
-			echo "            01 02 03"
-			echo "04 05 06 07 08 09 10"
+			echo "             1  2  3"
+			echo " 4  5  6  7  8  9 10"
 			echo "11 12 13 14 15 16 17"
 			echo "18 19 20 21 22 23 24"
 			echo "25 26 27 28 29 30 31"
